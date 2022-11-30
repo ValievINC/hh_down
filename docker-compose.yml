@@ -1,0 +1,19 @@
+version: '2.0'
+services:
+  hist_vacancy_downloader:
+    build: 
+      context: '.'
+    environment:
+      - START_ID
+    command: ["python3", "get_hist_vacancies.py"]
+    restart: unless-stopped
+    network_mode: "host"
+    volumes:
+        - ./:/home/vacancy_downloader/
+        - /etc/localtime:/etc/localtime:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "100"
+        max-size: "1000m"
+    mem_limit: 2048m
