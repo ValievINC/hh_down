@@ -1,6 +1,3 @@
-import requests
-import time
-import sys
 import csv
 import traceback
 import os
@@ -12,10 +9,11 @@ BASE_URL = "https://api.hh.ru"
 VACANCIES_URL = BASE_URL + "/vacancies"
 EMPLOYER_URL = BASE_URL + "/employers"
 
-START_ID = int(os.environ.get('START_ID'))
+START_ID = 1
 BUCKET_SIZE = 10000
 MAX_ID = 100_000_000
 #MAX_ID = 30_000_000
+failed_filename = open(str(os.environ.get('FILE')), 'r')
 
 TIMEOUT = 600
 
@@ -203,9 +201,9 @@ for start_id in range(START_ID, MAX_ID, BUCKET_SIZE):
         writer = csv.DictWriter(csv_file, fieldnames=COLUMN_NAMES)
         writer.writeheader()
 
-        for vacancy_id in range(start_id, start_id+BUCKET_SIZE):
-            log(f"Dumping vacancy_id={vacancy_id}")
-            resp = session.get(VACANCIES_URL + f"/{vacancy_id}", proxies=PROXIES, timeout=TIMEOUT)
+        for pos, vacancy_id in enumerate(failed_filename):
+            log(f"Dumping vacancy_id={int(vacancy_id)}")
+            resp = session.get(VACANCIES_URL + f"/{int(vacancy_id)}", proxies=PROXIES, timeout=TIMEOUT)
             if resp.status_code != 200:
                 err_code = resp.json()
                 if 'captcha_url' in err_code['errors'][0]:
